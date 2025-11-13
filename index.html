@@ -6,59 +6,91 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href='data:application/json,{ "name":"开心诺诺","short_name":"诺诺","start_url":"/","display":"standalone","background_color":"#000","theme_color":"#d11090","icons":[{"src":"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI5NiIgY3k9Ijk2IiByPSI5NiIgZmlsbD0iI2QxMTA5MCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjEyMCIgZmlsbD0iI2ZmZiIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+YijwvdGV4dD48L3N2Zz4=","sizes":"192x192","type":"image/svg+xml"}]}'>
+
+  <!-- 彩虹扫光字样式 -->
+  <style>
+    /* 基础 reset */
+    *{margin:0;padding:0;box-sizing:border-box}
+    body,html{width:100%;height:100%;overflow:hidden;font-family:"Poppins",sans-serif;display:flex;justify-content:center;align-items:center;background:#000}
+
+    /* 背景视频 */
+    video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-1}
+
+    /* 彩虹扫光字 */
+    #rainbow{
+      position:absolute;
+      font-size:clamp(2em,8vw,4em);
+      color:#fff;
+      text-align:center;
+      pointer-events:none;        /* 不挡点击 */
+    }
+    #rainbow::after{
+      content:attr(data-text);
+      position:absolute;
+      left:0;top:0;
+      width:100%;height:100%;
+      background:linear-gradient(90deg,#c23616,#192a56,#00d2d3,yellow,#6d214f,#2e86de,#4cd137,#e84118);
+      background-clip:text;
+      -webkit-background-clip:text;
+      color:transparent;
+      clip-path:circle(120px at 0 50%);
+      animation:move 4s linear infinite;
+    }
+    @keyframes move{50%{clip-path:circle(120px at 100% 50%)}}
+
+    /* 背景渐变动画（备用） */
+    @keyframes hue{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+  </style>
 </head>
+
 <body>
-<video id="bg" autoplay muted loop playsinline></video>
-<h1 id="wish"></h1>
+  <!-- 动态背景 -->
+  <video id="bg" autoplay muted loop playsinline></video>
 
-<audio id="bgm" loop></audio>
+  <!-- 彩虹扫光字幕 -->
+  <h1 data-text="希望诺诺天天开心！" id="rainbow"></h1>
 
-<script>
-/* ===== 1. 随机文案池 ===== */
-const wishes = [
-  "希望诺诺天天开心！",
-  "今天也要比昨天更快乐呀～",
-  "你一笑，世界就亮了✨",
-  "把烦恼调成静音🔇",
-  "诺诺的超能力：秒变开心！"
-];
-document.getElementById('wish').textContent = wishes[Math.floor(Math.random()*wishes.length)];
+  <!-- 背景音乐 -->
+  <audio id="bgm" loop></audio>
 
-/* ===== 2. 随机背景（视频/图片双保险） ===== */
-const videos = [
-  "https://cdn.jsdelivr.net/gh/verlok/doge@main/dynamic/christmas.mp4",
-  "https://cdn.jsdelivr.net/gh/verlok/doge@main/dynamic/rainbow.mp4"
-];
-const imgFallback = "https://source.unsplash.com/1600x900/?rainbow,smile";
-const vid = document.getElementById('bg');
-vid.src = videos[Math.floor(Math.random()*videos.length)];
-vid.onerror = () => {                       // CDN 挂了就换图片
-  vid.style.display='none';
-  document.body.style.background=`url(${imgFallback}) center/cover no-repeat fixed`;
-};
+  <script>
+    /* ===== 1. 随机文案池 ===== */
+    const wishes = [
+      "希望诺诺天天开心！",
+      "今天也要比昨天更快乐呀～",
+      "你一笑，世界就亮了✨",
+      "把烦恼调成静音🔇",
+      "诺诺的超能力：秒变开心！"
+    ];
+    // 把随机文案写进彩虹字幕的 data-text，实现每次刷新不同
+    document.getElementById('rainbow').setAttribute('data-text', wishes[Math.floor(Math.random()*wishes.length)]);
 
-/* ===== 3. 随机歌单（网易热门 5 首） ===== */
-const songs = [
-  {id:1963443271, name:"晴天"},            // 原曲
-  {id:1859245775, name:"稻香"},
-  {id:1860164833, name:"花海"},
-  {id:1859332214, name:"七里香"},
-  {id:1859332232, name:"告白气球"}
-];
-const pick = songs[Math.floor(Math.random()*songs.length)];
-const bgm = document.getElementById('bgm');
-bgm.src = `https://music.163.com/song/media/outer/url?id=${pick.id}.mp3`;
-bgm.onerror=()=>{                           // 网易 403 就换备用源
-  bgm.src="https://cdn.jsdelivr.net/gh/verlok/doge@main/mp3/happy.mp3";
-};
+    /* ===== 2. 随机背景（视频/图片双保险） ===== */
+    const videos = [
+      "https://cdn.jsdelivr.net/gh/verlok/doge@main/dynamic/christmas.mp4",
+      "https://cdn.jsdelivr.net/gh/verlok/doge@main/dynamic/rainbow.mp4"
+    ];
+    const imgFallback = "https://source.unsplash.com/1600x900/?rainbow,smile";
+    const vid = document.getElementById('bg');
+    vid.src = videos[Math.floor(Math.random()*videos.length)];
+    vid.onerror = () => {                       // CDN 挂了就换图片+渐变
+      vid.style.display='none';
+      document.body.style.background=`url(${imgFallback}) center/cover no-repeat fixed`;
+      document.body.style.animation='hue 8s infinite';
+    };
 
-/* ===== 4. 首次点击播放 + 后续自动播放 ===== */
-document.body.addEventListener('click',()=>bgm.play(),{once:true});
+    /* ===== 3. 阳光音乐 CDN ===== */
+    const bgm = document.getElementById('bgm');
+    bgm.src = "https://cdn.jsdelivr.net/gh/verlok/doge@main/mp3/sunny.mp3";
+    bgm.onerror=()=> bgm.src="https://cdn.jsdelivr.net/gh/verlok/doge@main/mp3/happy.mp3";
 
-/* ===== 5. PWA：安装到桌面 & 离线 ===== */
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js');
-}
-</script>
+    /* ===== 4. 首次点击播放 ===== */
+    document.body.addEventListener('click',()=>bgm.play(),{once:true});
+
+    /* ===== 5. PWA 离线缓存 ===== */
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
 </body>
 </html>
